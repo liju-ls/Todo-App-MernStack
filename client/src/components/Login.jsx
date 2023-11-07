@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import http from "../services/httpService";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login({ setActive }) {
@@ -9,7 +9,7 @@ function Login({ setActive }) {
 
   const loginHandle = (e) => {
     e.preventDefault();
-    axios
+    http
       .post("http://localhost:3000/auth/login", {
         email: email,
         password: password,

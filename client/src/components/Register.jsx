@@ -1,6 +1,6 @@
-import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import http from "../services/httpService";
 
 function Register() {
   const [name, setName] = useState("");
@@ -10,7 +10,7 @@ function Register() {
 
   const registerHandle = (e) => {
     e.preventDefault();
-    axios
+    http
       .post("http://localhost:3000/auth/register", {
         name: name,
         email: email,
