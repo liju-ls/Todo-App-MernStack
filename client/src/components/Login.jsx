@@ -10,7 +10,7 @@ function Login({ setActive }) {
   const loginHandle = (e) => {
     e.preventDefault();
     http
-      .post("http://localhost:3000/auth/login", {
+      .post("/auth/login", {
         email: email,
         password: password,
       })

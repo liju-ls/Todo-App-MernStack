@@ -11,7 +11,7 @@ function Register() {
   const registerHandle = (e) => {
     e.preventDefault();
     http
-      .post("http://localhost:3000/auth/register", {
+      .post("/register", {
         name: name,
         email: email,
         password: password,
