@@ -5,7 +5,9 @@ const cors = require("cors");
 require("dotenv").config();
 
 mongoose
-  .connect("mongodb://localhost:27017/todo")
+  .connect(
+    "mongodb+srv://liju:liju1234@ls-organisation.fr1txtr.mongodb.net/?retryWrites=true&w=majority"
+  )
   .then(() => {
     console.log("Connected to mongodb.");
   })
@@ -22,7 +24,7 @@ const accountRoute = require("./routes/account");
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:5173",
+    origin: "https://todo-app-gamma-snowy-57.vercel.app",
   })
 );
 app.use(express.static(path.join(__dirname, "public")));
