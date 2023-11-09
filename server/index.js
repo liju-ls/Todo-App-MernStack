@@ -21,7 +21,6 @@ const accountRoute = require("./routes/account");
 
 app.use(
   cors({
-    credentials: true,
     origin: "https://todo-app-gamma-snowy-57.vercel.app",
   })
 );
