@@ -5,9 +5,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 mongoose
-  .connect(
-    "mongodb+srv://liju:liju1234@ls-organisation.fr1txtr.mongodb.net/?retryWrites=true&w=majority"
-  )
+  .connect(process.env.URI)
   .then(() => {
     console.log("Connected to mongodb.");
   })
