@@ -21,7 +21,7 @@ const accountRoute = require("./routes/account");
 
 app.use(
   cors({
-    origin: "https://todo-app-gamma-snowy-57.vercel.app",
+    origin: "https://todoappclient-vgnm.onrender.com/",
   })
 );
 app.use(express.static(path.join(__dirname, "public")));

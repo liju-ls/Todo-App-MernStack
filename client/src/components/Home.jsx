@@ -48,7 +48,7 @@ function Home() {
           console.log(err);
         });
     }
-    if (!isUpdated) {
+    if (!isUpdated === false && isLogged === true) {
       fetchTodo();
     }
   }, [isUpdated]);
