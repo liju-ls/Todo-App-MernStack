@@ -9,6 +9,10 @@ const {
 } = require("../controllers/account");
 const { isAuth } = require("../middlewares/authorization");
 
+router.get("/", (req, res) => {
+  res.json({ page: "Homepage" });
+});
+
 router.patch("/new", isAuth, addTodo);
 
 router.patch("/update", isAuth, updateTodo);
