@@ -32,26 +32,25 @@ function Home() {
     }
   }, []);
 
-  useEffect(() => {
-    async function fetchTodo() {
-      http
-        .get("/allTodo", {
-          headers: {
-            "x-auth-token": localStorage.getItem("token"),
-          },
-        })
-        .then((res) => {
-          setTodoList(res.data);
-          setIsUpdated(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    if (isUpdated === false && isLogged === true) {
-      fetchTodo();
-    }
-  }, [isUpdated]);
+  async function fetchTodo() {
+    http
+      .get("/allTodo", {
+        headers: {
+          "x-auth-token": localStorage.getItem("token"),
+        },
+      })
+      .then((res) => {
+        setTodoList(res.data);
+        setIsUpdated(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  if (!isUpdated && isLogged) {
+    fetchTodo();
+  }
 
   function handleNewTodo(e) {
     setNewTodo(e.target.value);
