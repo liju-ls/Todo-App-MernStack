@@ -19,11 +19,7 @@ const errorController = require("./controllers/error");
 const authRoute = require("./routes/auth");
 const accountRoute = require("./routes/account");
 
-app.use(
-  cors({
-    origin: "https://todoappclient-vgnm.onrender.com/",
-  })
-);
+app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
