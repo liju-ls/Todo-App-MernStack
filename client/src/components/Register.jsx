@@ -1,27 +1,33 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import http from "../services/httpService";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const navigate = useNavigate();
 
-  const registerHandle = (e) => {
+  const registerHandle = async (e) => {
     e.preventDefault();
-    http
-      .post("/auth/register", {
+
+    try {
+      const result = await http.post("/auth/register", {
         name: name,
         email: email,
         password: password,
-      })
-      .then((res) => {
-        setErr(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
       });
+      setNotification(result.data.message);
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      if (err.response) {
+        return setNotification(err.response.data.message);
+      }
+      setNotification(err.message);
+    }
   };
 
   const handleInput = (e) => {
@@ -38,12 +44,25 @@ function Register() {
 
   return (
     <div className="container vh-100 d-flex align-items-center">
-      {err && <p>{err}</p>}
       <form
         method="post"
         className="container w-50 d-flex flex-column"
         onSubmit={registerHandle}
       >
+        {notification && (
+          <div
+            className="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            {notification}
+            <button
+              type="button"
+              className="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+        )}
         <div className="mt-2">
           <input
             type="text"
@@ -72,8 +91,8 @@ function Register() {
             className="form-control"
             name="password"
             placeholder="Password"
-            minLength={4}
-            maxLength={8}
+            minLength={8}
+            maxLength={16}
             required
             onChange={handleInput}
           />

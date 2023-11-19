@@ -2,26 +2,31 @@ import { useState } from "react";
 import http from "../services/httpService";
 import { Link, useNavigate } from "react-router-dom";
 
-function Login({ setActive }) {
+function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [notification, setNotification] = useState(null);
   const navigate = useNavigate();
 
-  const loginHandle = (e) => {
+  const loginHandle = async (e) => {
     e.preventDefault();
-    http
-      .post("/auth/login", {
+    try {
+      const result = await http.post("/auth/login", {
         email: email,
         password: password,
-      })
-      .then((res) => {
-        localStorage.setItem("token", res.headers["x-auth-token"]);
-        console.log("token set.");
-        navigate("/");
-      })
-      .catch((err) => {
-        console.log(err);
       });
+
+      localStorage.setItem("token", result.headers["x-auth-token"]);
+      setNotification(result.data.message);
+      setTimeout(() => {
+        navigate("/");
+      }, 2000);
+    } catch (err) {
+      if (err.response) {
+        return setNotification(err.response.data.message);
+      }
+      setNotification(err.message);
+    }
   };
 
   const handleInput = (e) => {
@@ -34,39 +39,56 @@ function Login({ setActive }) {
   };
 
   return (
-    <div className="container vh-100 d-flex align-items-center">
-      <form
-        className="container w-50 d-flex flex-column"
-        action="/auth/login"
-        method="post"
-        onSubmit={loginHandle}
-      >
-        <div className="mt-2">
-          <input
-            type="text"
-            className="form-control"
-            name="email"
-            placeholder="Email"
-            required
-            onChange={handleInput}
-          />
-        </div>
-        <div className="mt-2">
-          <input
-            type="password"
-            className="form-control"
-            name="password"
-            placeholder="Password"
-            required
-            onChange={handleInput}
-          />
-        </div>
-        <button className="btn btn-success mt-3">Login</button>
-        <div className="mt-3">
-          Don't have an account? <Link to="/register">Register.</Link>
-        </div>
-      </form>
-    </div>
+    <>
+      <div className="container vh-100 d-flex align-items-center">
+        <form
+          className="container w-50 d-flex flex-column"
+          action="/auth/login"
+          method="post"
+          onSubmit={loginHandle}
+        >
+          {notification && (
+            <div
+              className="alert alert-danger alert-dismissible fade show"
+              role="alert"
+            >
+              {notification}
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+          )}
+
+          <div className="mt-2">
+            <input
+              type="text"
+              className="form-control"
+              name="email"
+              placeholder="Email"
+              required
+              onChange={handleInput}
+            />
+          </div>
+          <div className="mt-2">
+            <input
+              type="password"
+              className="form-control"
+              name="password"
+              placeholder="Password"
+              required
+              onChange={handleInput}
+            />
+          </div>
+          <button className="btn btn-success mt-3">Login</button>
+          <div className="mt-3">
+            Don't have an account? <Link to="/register">Register.</Link>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
 

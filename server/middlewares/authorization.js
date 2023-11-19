@@ -1,17 +1,26 @@
 const jwt = require("jsonwebtoken");
+const asyncMiddleware = require("./async");
+const winston = require("winston");
+const logger = require("../utils/logger");
 
-module.exports.isAuth = async (req, res, next) => {
+module.exports = async (req, res, next) => {
   if (!req.headers["x-auth-token"]) {
-    return res.status(401).json({ msg: "Something went wrong 1." });
+    logger.error("Invalid token");
+    return res.status(400).json({ status: "failed", message: "Token error." });
   }
 
-  const isValid = jwt.verify(req.headers["x-auth-token"], process.env.JWT_KEY);
-
-  if (!isValid) {
-    return res.status(401).json({ msg: "Something went wrong 2." });
-  }
-
-  const decodedToken = jwt.decode(req.headers["x-auth-token"]);
-  req.id = decodedToken._doc._id;
-  next();
+  jwt.verify(
+    req.headers["x-auth-token"],
+    process.env.JWT_KEY,
+    (err, decode) => {
+      if (err) {
+        logger.error("Token error", err);
+        return res
+          .status(400)
+          .json({ status: "failed", message: "Token error." });
+      }
+      req.id = decode._doc._id;
+      next();
+    }
+  );
 };

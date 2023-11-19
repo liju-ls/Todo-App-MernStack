@@ -1,43 +1,41 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/User");
+const asyncMiddleware = require("../middlewares/async");
 
-module.exports.postLogin = async (req, res) => {
-  await UserModel.findOne({ email: req.body.email })
-    .then((data) => {
-      if (!data) {
-        return res.send("Invalid email.");
-      }
+module.exports.postLogin = asyncMiddleware(async (req, res, next) => {
+  const user = await UserModel.findOne({ email: req.body.email });
 
-      bcrypt.hash(req.body.password, 8).then((hashed) => {
-        if (!hashed === data.password) {
-          return res.send("Invalid Password.");
-        }
-        const token = jwt.sign({ ...data }, process.env.JWT_KEY);
-        res.set("x-auth-token", token);
-        res.set("Access-Control-Expose-Headers", "x-auth-token");
-        return res.status(200).end();
-      });
-    })
-    .catch((err) => {
-      return console.log(err);
-    });
-};
+  if (!user) {
+    throw new Error("Invalid email.");
+  }
 
-module.exports.postRegister = async (req, res) => {
-  console.log(req.body);
-  await UserModel.findOne({ email: req.body.email })
-    .then((data) => {
-      if (data) {
-        return res.send("Email already exist.");
-      }
-      bcrypt.hash(req.body.password, 8).then((hashed) => {
-        const user = new UserModel({ ...req.body, password: hashed });
-        user.save();
-        return res.send("Account created.");
-      });
-    })
-    .catch((err) => {
-      return res.send("Something went wrong.");
-    });
-};
+  const isValidPass = await bcrypt.compare(req.body.password, user.password);
+  if (!isValidPass) throw new Error("Invalid password.");
+
+  jwt.sign({ ...user }, process.env.JWT_KEY, (err, token) => {
+    if (err) throw new Error(err);
+
+    res.set("x-auth-token", token);
+    res.set("Access-Control-Expose-Headers", "x-auth-token");
+
+    return res
+      .status(200)
+      .json({ status: "sucess", message: "login success." });
+  });
+});
+
+module.exports.postRegister = asyncMiddleware(async (req, res, next) => {
+  const user = await UserModel.findOne({ email: req.body.email });
+
+  if (user) {
+    throw new Error("Email already exist.");
+  }
+
+  const hashed = await bcrypt.hash(req.body.password, 8);
+  const newUser = new UserModel({ ...req.body, password: hashed });
+  await newUser.save();
+  res
+    .status(200)
+    .json({ status: "success", message: "Account created succesfully." });
+});

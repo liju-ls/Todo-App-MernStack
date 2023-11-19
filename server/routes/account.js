@@ -7,9 +7,10 @@ const {
   updateTodo,
   updateCompletedTodo,
 } = require("../controllers/account");
-const { isAuth } = require("../middlewares/authorization");
+const isAuth = require("../middlewares/authorization");
 
 router.get("/", (req, res) => {
+  
   res.json({ page: "Homepage" });
 });
 
